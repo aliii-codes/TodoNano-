@@ -1,7 +1,7 @@
 // Typical Arduino nano
 
 // 13 SCL
-// 11 SDA 
+// 11 SDA
 // 5 RES
 // 7 DC
 // 6 CS
@@ -29,6 +29,10 @@ String defaultTODOS[] = {
   "Learn Attention"
 };
 
+char chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+int currentCharIndex = 0;
+String currentTodo = "";
+
 int numTodos = sizeof(defaultTODOS) / sizeof(defaultTODOS[0]);
 
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RES);
@@ -47,18 +51,18 @@ void setup() {
   gotoWATCHTODO();
 
   // Serial.println(numTodos);
-
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   int upsensor_state = digitalRead(upsensor);
   int selector_state = digitalRead(selector);
+  int downbtn_state = digitalRead(downbtn); // just remember that on == 0 and off == 1 
 
-  if (upsensor_state == 1) {   // if touched
-    screenMode += 1;  // increment screenMode
-    if (screenMode > 2) {  // if screenMode is too big 
-      screenMode = 0;  // reset to 0
+  if (upsensor_state == 1) {  // if touched
+    screenMode += 1;          // increment screenMode
+    if (screenMode > 2) {     // if screenMode is too big
+      screenMode = 0;         // reset to 0
     }
     mainMenu();
     // gotoADDTODO();
@@ -74,9 +78,25 @@ void loop() {
     if (screenMode == 2) {
       gotoDELETETODO();
     }
-    
   }
-  
+  if (downbtn_state == 0) {
+    screenMode -= 1;
+    if (screenMode < 0) {
+      screenMode = 2;
+    }
+    mainMenu();
+
+    if (screenMode == 0) {
+      gotoWATCHTODO();
+    }
+    if (screenMode == 1) {
+      gotoADDTODO();
+    }
+    if (screenMode == 2) {
+      gotoDELETETODO();
+    }
+  }
+
   if (screenMode == 0 && selector_state == 1) {
     watchTodos();
   }
@@ -88,9 +108,9 @@ void mainMenu() {
   tft.setTextColor(ST77XX_BLUE);
   tft.setRotation(1);
   tft.setTextSize(1);
-  tft.setCursor(25,20);
+  tft.setCursor(25, 20);
 
-  
+
   tft.print("THE GREAT TODO");
   // tft.println("Yoo Ali broo !");
   // tft.fillRect(50, 50, 50, 50, ST77XX_BLUE);
@@ -124,11 +144,11 @@ void gotoDELETETODO() {
 
 void watchTodos() {
   tft.fillScreen(ST77XX_BLACK);
-  
+
   tft.setTextSize(1);
 
-  
-  
+
+
   tft.setTextColor(ST77XX_WHITE);
 
   for (int i = 0; i < numTodos; i++) {
@@ -137,4 +157,8 @@ void watchTodos() {
     tft.print(": ");
     tft.print(defaultTODOS[i]);
   }
-} 
+}
+
+void addTODO() {
+  
+}
