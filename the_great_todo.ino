@@ -14,9 +14,22 @@ const int TFT_RES = 5;
 const int TFT_DC = 7;
 const int TFT_CS = 6;
 
-const int touchSensor = 12;
+
+const int upsensor = 12;
+const int selector = 4;
+const int downbtn = 10;
+
 
 int screenMode = 0;
+
+String defaultTODOS[] = {
+  "Study Physics",
+  "Learn RNN",
+  "Learn Transformers",
+  "Learn Attention"
+};
+
+int numTodos = sizeof(defaultTODOS) / sizeof(defaultTODOS[0]);
 
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RES);
 
@@ -24,23 +37,27 @@ Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RES);
 
 void setup() {
   // put your setup code here, to run once:
-  pinMode(touchSensor, INPUT);
+  pinMode(upsensor, INPUT);
+  pinMode(selector, INPUT);
+  pinMode(downbtn, INPUT_PULLUP);
 
   Serial.begin(9600);
   tft.initR(INITR_GREENTAB);
   mainMenu();
   gotoWATCHTODO();
 
+  // Serial.println(numTodos);
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int touch_state = digitalRead(touchSensor);
+  int upsensor_state = digitalRead(upsensor);
+  int selector_state = digitalRead(selector);
 
-  if (touch_state == 1) {   // if touched
+  if (upsensor_state == 1) {   // if touched
     screenMode += 1;  // increment screenMode
-    if (screenMode > 2) {  // if screenMode too big 
+    if (screenMode > 2) {  // if screenMode is too big 
       screenMode = 0;  // reset to 0
     }
     mainMenu();
@@ -57,8 +74,12 @@ void loop() {
     if (screenMode == 2) {
       gotoDELETETODO();
     }
+    
   }
   
+  if (screenMode == 0 && selector_state == 1) {
+    watchTodos();
+  }
 }
 
 
@@ -101,4 +122,19 @@ void gotoDELETETODO() {
   tft.drawRect(15, 105, 80, 20, ST77XX_WHITE);
 }
 
+void watchTodos() {
+  tft.fillScreen(ST77XX_BLACK);
+  
+  tft.setTextSize(1);
 
+  
+  
+  tft.setTextColor(ST77XX_WHITE);
+
+  for (int i = 0; i < numTodos; i++) {
+    tft.setCursor(10, 20 + (i * 20));
+    tft.print(i + 1);
+    tft.print(": ");
+    tft.print(defaultTODOS[i]);
+  }
+} 
