@@ -28,7 +28,6 @@ void setup() {
 
   Serial.begin(9600);
   tft.initR(INITR_GREENTAB);
-  tft.fillScreen(ST77XX_BLACK);
   mainMenu();
 
   tft.drawRect(15, 45, 70, 20, ST77XX_WHITE);
@@ -36,13 +35,12 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // tft.print("TODO");
   int touch_state = digitalRead(touchSensor);
 
   if (touch_state == 1) {
     // Serial.println("WORKS");
     mainMenu();
-    tft.drawRect(25, 65, 60, 20, ST77XX_WHITE);
+    tft.drawRect(15, 75, 60, 20, ST77XX_WHITE);
   } else {
     Serial.println("Nothing ");
   }
@@ -51,11 +49,11 @@ void loop() {
 
 
 void mainMenu() {
+  tft.fillScreen(ST77XX_BLACK);
   tft.setTextColor(ST77XX_BLUE);
   tft.setRotation(1);
   tft.setTextSize(1);
   tft.setCursor(25,20);
-
 
   
   tft.print("THE GREAT TODO");
