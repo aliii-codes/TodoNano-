@@ -16,7 +16,7 @@ const int TFT_CS = 6;
 
 const int touchSensor = 12;
 
-int screenMode = -1;
+int screenMode = 0;
 
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RES);
 
@@ -29,6 +29,7 @@ void setup() {
   Serial.begin(9600);
   tft.initR(INITR_GREENTAB);
   mainMenu();
+  gotoWATCHTODO();
 
 
 }
