@@ -16,7 +16,7 @@ const int TFT_CS = 6;
 
 const int touchSensor = 12;
 
-int screenMode = 0;
+int screenMode = -1;
 
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RES);
 
@@ -30,19 +30,32 @@ void setup() {
   tft.initR(INITR_GREENTAB);
   mainMenu();
 
-  tft.drawRect(15, 45, 70, 20, ST77XX_WHITE);
+
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   int touch_state = digitalRead(touchSensor);
 
-  if (touch_state == 1) {
-    // Serial.println("WORKS");
+  if (touch_state == 1) {   // if touched
+    screenMode += 1;  // increment screenMode
+    if (screenMode > 2) {  // if screenMode too big 
+      screenMode = 0;  // reset to 0
+    }
     mainMenu();
-    tft.drawRect(15, 75, 60, 20, ST77XX_WHITE);
-  } else {
-    Serial.println("Nothing ");
+    // gotoADDTODO();
+
+    // screenMode = 0;
+
+    if (screenMode == 0) {
+      gotoWATCHTODO();
+    }
+    if (screenMode == 1) {
+      gotoADDTODO();
+    }
+    if (screenMode == 2) {
+      gotoDELETETODO();
+    }
   }
   
 }
@@ -74,3 +87,17 @@ void mainMenu() {
   tft.setCursor(20, 110);
   tft.print("DELETE TODO");
 }
+
+void gotoADDTODO() {
+  tft.drawRect(15, 75, 60, 20, ST77XX_WHITE);
+}
+
+void gotoWATCHTODO() {
+  tft.drawRect(15, 45, 70, 20, ST77XX_WHITE);
+}
+
+void gotoDELETETODO() {
+  tft.drawRect(15, 105, 80, 20, ST77XX_WHITE);
+}
+
+
