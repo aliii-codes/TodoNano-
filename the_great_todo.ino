@@ -33,6 +33,8 @@ char chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
 int currentCharIndex = 0;
 String currentTodo = "";
 
+bool inADDTODO = false;
+
 int numTodos = sizeof(defaultTODOS) / sizeof(defaultTODOS[0]);
 
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RES);
@@ -59,53 +61,94 @@ void loop() {
   int selector_state = digitalRead(selector);
   int downbtn_state = digitalRead(downbtn); // just remember that on == 0 and off == 1 
 
-  if (upsensor_state == 1) {  // if touched
-    screenMode += 1;          // increment screenMode
-    if (screenMode > 2) {     // if screenMode is too big
-      screenMode = 0;         // reset to 0
-    }
-    mainMenu();
-    // gotoADDTODO();
 
-    // screenMode = 0;
+  if (inADDTODO == false) {
+    if (upsensor_state == 1) {  // if touched
+      screenMode += 1;          // increment screenMode
+      if (screenMode > 2) {     // if screenMode is too big
+        screenMode = 0;         // reset to 0
+      }
+      mainMenu();
+      // gotoADDTODO();
 
-    if (screenMode == 0) {
-      gotoWATCHTODO();
+      // screenMode = 0;
+
+    
+      if (screenMode == 0) {
+        gotoWATCHTODO();
+        delay(200);
+      }
+      if (screenMode == 1) {
+        gotoADDTODO();
+        delay(200);
+      }
+      if (screenMode == 2) {
+        gotoDELETETODO();
+        delay(200);
+      }
     }
-    if (screenMode == 1) {
-      gotoADDTODO();
-    }
-    if (screenMode == 2) {
-      gotoDELETETODO();
+    if (downbtn_state == 0) {
+      screenMode -= 1;
+      if (screenMode < 0) {
+        screenMode = 2;
+      }
+      mainMenu();
+
+      if (screenMode == 0) {
+        gotoWATCHTODO();
+      }
+      if (screenMode == 1) {
+        gotoADDTODO();
+      }
+      if (screenMode == 2) {
+        gotoDELETETODO();
+      }
     }
   }
-  if (downbtn_state == 0) {
-    screenMode -= 1;
-    if (screenMode < 0) {
-      screenMode = 2;
-    }
-    mainMenu();
 
-    if (screenMode == 0) {
-      gotoWATCHTODO();
+  if (inADDTODO == true) {
+    if (upsensor_state == 1) {
+      currentCharIndex++;
+      delay(200);
+      if (currentCharIndex > sizeof(chars) -2) {
+        currentCharIndex = 0;
+      } 
+      tft.fillRect(38, 100, 20, 10, ST77XX_BLACK);
+      tft.setCursor(38, 100);
+      tft.print(chars[currentCharIndex]);
     }
-    if (screenMode == 1) {
-      gotoADDTODO();
+    if (downbtn_state == 0) {
+      currentCharIndex--;
+      delay(200);
+      if (currentCharIndex < 0) {
+        currentCharIndex = sizeof(chars) -2;
+      }
+      tft.fillRect(38, 100, 20, 10, ST77XX_BLACK);
+      tft.setCursor(38, 100);
+      tft.print(chars[currentCharIndex]);
     }
-    if (screenMode == 2) {
-      gotoDELETETODO();
+    if (selector_state == 1) {
+      currentTodo += chars[currentCharIndex];
+      tft.fillRect(15, 55, 90, 10, ST77XX_BLACK);
+      tft.setCursor(17, 57);
+      tft.print(currentTodo); 
+      delay(300);
     }
   }
 
   if (screenMode == 0 && selector_state == 1) {
     watchTodos();
   }
+  if (screenMode == 1 && selector_state == 1) {
+    inADDTODO = true;
+    addTODO();
+  }  
 }
 
 
 void mainMenu() {
   tft.fillScreen(ST77XX_BLACK);
-  tft.setTextColor(ST77XX_BLUE);
+  tft.setTextColor(ST77XX_CYAN);
   tft.setRotation(1);
   tft.setTextSize(1);
   tft.setCursor(25, 20);
@@ -160,5 +203,25 @@ void watchTodos() {
 }
 
 void addTODO() {
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setRotation(1);
+  tft.setCursor(40,25);
+  tft.setTextColor(ST77XX_CYAN);
+  tft.setTextSize(1);
+  tft.print("ADD TODO");
+
+  tft.setCursor(1, 35);
+  tft.setTextColor(ST77XX_WHITE);
+  tft.print("-------------------------");
+
+  tft.drawRect(15, 55, 100, 20, ST77XX_WHITE);  
+
+  tft.setCursor(2, 100);
+  tft.print("Char: ");
+
+  tft.setCursor(38, 100);
+  tft.print(chars[currentCharIndex]);
   
+  tft.setCursor(2, 110);
+  tft.print("sel : add char");
 }
