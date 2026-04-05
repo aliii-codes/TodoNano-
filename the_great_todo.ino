@@ -56,63 +56,37 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   int upsensor_state = digitalRead(upsensor);
   int selector_state = digitalRead(selector);
-  int downbtn_state = digitalRead(downbtn); // just remember that on == 0 and off == 1 
-
+  int downbtn_state = digitalRead(downbtn);
 
   if (inADDTODO == false) {
-    if (upsensor_state == 1) {  // if touched
-      screenMode += 1;          // increment screenMode
-      if (screenMode > 2) {     // if screenMode is too big
-        screenMode = 0;         // reset to 0
-      }
+    if (upsensor_state == 1) {
+      screenMode += 1;
+      if (screenMode > 2) { screenMode = 0; }
       mainMenu();
-      // gotoADDTODO();
-
-      // screenMode = 0;
-
-    
-      if (screenMode == 0) {
-        gotoWATCHTODO();
-        delay(200);
-      }
-      if (screenMode == 1) {
-        gotoADDTODO();
-        delay(200);
-      }
-      if (screenMode == 2) {
-        gotoDELETETODO();
-        delay(200);
-      }
+      if (screenMode == 0) { gotoWATCHTODO(); delay(200); }
+      if (screenMode == 1) { gotoADDTODO(); delay(200); }
+      if (screenMode == 2) { gotoDELETETODO(); delay(200); }
     }
     if (downbtn_state == 0) {
       screenMode -= 1;
-      if (screenMode < 0) {
-        screenMode = 2;
-      }
+      delay(200);
+      if (screenMode < 0) { screenMode = 2; }
       mainMenu();
-
-      if (screenMode == 0) {
-        gotoWATCHTODO();
-      }
-      if (screenMode == 1) {
-        gotoADDTODO();
-      }
-      if (screenMode == 2) {
-        gotoDELETETODO();
-      }
+      if (screenMode == 0) { gotoWATCHTODO(); }
+      if (screenMode == 1) { gotoADDTODO(); }
+      if (screenMode == 2) { gotoDELETETODO(); }
     }
+    if (screenMode == 0 && selector_state == 1) { watchTodos(); }
+    if (screenMode == 1 && selector_state == 1) { inADDTODO = true; addTODO(); }
   }
 
   if (inADDTODO == true) {
     if (upsensor_state == 1) {
       currentCharIndex++;
       delay(200);
-      if (currentCharIndex > sizeof(chars) -2) {
-        currentCharIndex = 0;
-      } 
+      if (currentCharIndex > sizeof(chars) - 2) { currentCharIndex = 0; }
       tft.fillRect(38, 100, 20, 10, ST77XX_BLACK);
       tft.setCursor(38, 100);
       tft.print(chars[currentCharIndex]);
@@ -120,9 +94,7 @@ void loop() {
     if (downbtn_state == 0) {
       currentCharIndex--;
       delay(200);
-      if (currentCharIndex < 0) {
-        currentCharIndex = sizeof(chars) -2;
-      }
+      if (currentCharIndex < 0) { currentCharIndex = sizeof(chars) - 2; }
       tft.fillRect(38, 100, 20, 10, ST77XX_BLACK);
       tft.setCursor(38, 100);
       tft.print(chars[currentCharIndex]);
@@ -131,18 +103,10 @@ void loop() {
       currentTodo += chars[currentCharIndex];
       tft.fillRect(15, 55, 90, 10, ST77XX_BLACK);
       tft.setCursor(17, 57);
-      tft.print(currentTodo); 
+      tft.print(currentTodo);
       delay(300);
     }
   }
-
-  if (screenMode == 0 && selector_state == 1) {
-    watchTodos();
-  }
-  if (screenMode == 1 && selector_state == 1) {
-    inADDTODO = true;
-    addTODO();
-  }  
 }
 
 
